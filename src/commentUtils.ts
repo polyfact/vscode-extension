@@ -31,10 +31,15 @@ export function removeBlockComment(code: string): string {
 
 // insert comment
 export function insertComment(snippet: string, data: Data) {
-  const { symbols, comment } = data;
+  const { symbols, comment, isFunction } = data;
+
+  if (!isFunction) {
+    throw new Error("NOT_FUNCTION");
+  }
 
   if (!symbols || !comment) {
-    throw new Error("Incomplete data provided to insertComment");
+    console.log({ symbols, comment, snippet, data });
+    throw new Error("INCOMPLETE_DATA");
   }
 
   const { open, close } = symbols;
@@ -47,10 +52,12 @@ export function insertComment(snippet: string, data: Data) {
       .replace(/\\n/g, "\n"),
     close,
     snippet,
-  ].join("\n");
+  ]
+    .join("\n")
+    .trim();
 }
 
-function extractBetweenBraces(text: string) {
+export function extractBetweenBraces(text: string) {
   const firstBrace = text.indexOf("{");
   const lastBrace = text.lastIndexOf("}");
 
@@ -73,7 +80,7 @@ async function updateEditorText(
 ): Promise<void> {
   const fullRange = new vscode.Range(
     editor.document.positionAt(0),
-    editor.document.positionAt(code.length)
+    editor.document.positionAt(999999999999)
   );
   await editor.edit((editBuilder) => {
     editBuilder.replace(fullRange, code);
@@ -92,34 +99,45 @@ export async function commentFunctions(
       cancellable: true,
     },
     async (progress) => {
-      progress.report({ message: "Starting...", increment: 0 });
+      progress.report({ message: "Generating...", increment: 0 });
       const progressIncrement = 100 / functionsInCode.length;
       const language = editor.document.languageId;
 
-      const promises = functionsInCode.map((originalFunction, i) => {
-        const functionWithoutBlockComment =
-          removeBlockComment(originalFunction);
+      const config = vscode.workspace.getConfiguration("polyfact-extension");
+      const accessToken = config.get("accessToken") as string;
 
-        return APIHandler.comment(functionWithoutBlockComment, language)
-          .then((response) => {
-            const responseData = parseResponse(response);
-            const codeWithBlockComment = insertComment(
-              functionWithoutBlockComment,
-              responseData
-            );
+      const promises = functionsInCode.map(async (originalFunction, i) => {
+        const request = new APIHandler();
 
-            code = code.replace(originalFunction, codeWithBlockComment);
-            progress.report({
-              message: `Commenting function ${i + 1}`,
-              increment: progressIncrement,
-            });
-          })
-          .catch((error) => {
+        try {
+          const response = await request.comment(
+            originalFunction,
+            language,
+            accessToken
+          );
+          const responseData = parseResponse(response);
+          const codeWithBlockComment = insertComment(
+            originalFunction,
+            responseData
+          );
+
+          code = code.replace(originalFunction, codeWithBlockComment);
+
+          progress.report({
+            message: `Commenting function ${i + 1}`,
+            increment: progressIncrement,
+          });
+        } catch (error: any) {
+          if (error.msg === "NOT_FUNCTION") {
+            console.log("It's not a function : ", originalFunction);
+          } else if (error.msg === "INCOMPLETE_DATA") {
             vscode.window.showErrorMessage(
               "Failed to fetch comments for function: " + (i + 1)
             );
-            console.error(error);
-          });
+          }
+          console.error(error);
+          request.cancelOperation(true);
+        }
       });
 
       const results = await Promise.allSettled(promises);

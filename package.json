@@ -2,7 +2,8 @@
   "name": "polyfact-extension",
   "displayName": "Polyfact Extension",
   "description": "VS Code extension developed for efficient code comment management. It integrates with the Polyfact API and supports multiple programming languages.",
-  "version": "0.0.1",
+  "version": "0.0.5",
+  "publisher": "Polyfactdocs",
   "license": "MIT",
   "engines": {
     "vscode": "^1.79.0"
@@ -25,6 +26,24 @@
         "title": "Polyfact Extension"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "polyfact-extension.commentFunctions",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Polyfact Extension",
+      "properties": {
+        "polyfact-extension.accessToken": {
+          "type": "string",
+          "default": "",
+          "description": "Access token for Polyfact Extension."
+        }
+      }
+    },
     "keybindings": [
       {
         "command": "polyfact-extension.commentFunctions",
@@ -49,6 +68,7 @@
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.1.1",
     "@types/node": "16.x",
+    "@types/sinon": "^10.0.15",
     "@types/vscode": "^1.79.0",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
@@ -62,6 +82,7 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
-    "langchain": "^0.0.102"
+    "langchain": "^0.0.102",
+    "sinon": "^15.2.0"
   }
 }

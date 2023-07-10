@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
-import { commentFunctions } from "./commentUtils";
+import { commentFunctions, removeBlockComment } from "./commentUtils";
 import { splitIntoCodeBlocks } from "./helpers";
-import { APIHandler } from "./api";
 
 const getActiveEditor = (): vscode.TextEditor | undefined => {
   const editor = vscode.window.activeTextEditor;
@@ -22,24 +21,19 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      try {
-        const option = await vscode.window.showWarningMessage(
-          "Please do not close this tab, switch tabs, or edit the code while the operation is in progress.",
-          { modal: true },
-          "Continue"
-        );
-        if (option === "Continue") {
-          const document = editor.document;
-          const code = document.getText();
-          const functionsInCode = splitIntoCodeBlocks(code);
+      const option = await vscode.window.showWarningMessage(
+        "Please do not close this tab, switch tabs, or edit the code while the operation is in progress.",
+        { modal: true },
+        "Continue"
+      );
+      if (option === "Continue") {
+        const document = editor.document;
+        const code = removeBlockComment(document.getText());
+        const functionsInCode = splitIntoCodeBlocks(code);
 
-          await commentFunctions(code, functionsInCode, editor);
+        await commentFunctions(code, functionsInCode, editor);
 
-          vscode.window.showInformationMessage("End");
-        }
-      } catch (error: any) {
-        vscode.window.showErrorMessage(`An error occurred: ${error.message}`);
-        APIHandler.cancelOperation();
+        vscode.window.showInformationMessage("Comments Block generated!");
       }
     }
   );
