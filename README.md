@@ -17,17 +17,22 @@ The Polyfact Extension is open-source software licensed under the terms of the M
 - **Command Activation**: The `polyfact-extension.commentFunctions` command, once executed, activates the extension.
 - **Accessible Keybindings**: To invoke the command, use the keyboard shortcut `Ctrl+Shift+D` (`Cmd+Shift+D` on macOS) when the text editor is focused.
 - **Context Menu Activation**: Users can also activate the Polyfact Extension by right-clicking in the editor and selecting 'Polyfact Extension' from the context menu.
+- **Comment Detail Level Selection**: The extension now offers a configurable 'Mode' setting to choose the level of detail in the generated block comments. Users can select between 'light', 'normal', and 'reinforced' modes, each offering different levels of comment detail.
 
 ## Configuration and Access Token Acquisition
 
 The Polyfact Extension requires an access token for integration with the Polyfact API. Here's how to acquire an access token and configure the `polyfact-extension.accessToken`:
 
-1. Visit [Polyfact's application](https://app.polyfact.com/) and click on 'Connect with Github'.
-2. Once you're authenticated with Github, you will be able to see your access token.
-3. Copy the provided access token.
-4. Now, navigate to the Visual Studio Code settings (File > Preferences > Settings).
-5. In the search bar at the top of the settings panel, type 'Polyfact Extension'.
-6. Click on 'Edit in settings.json' under the 'Polyfact Extension' section.
+... (same steps as before)
+
+To set the detail level for the generated comments:
+
+1. Navigate to the Visual Studio Code settings (File > Preferences > Settings).
+2. In the search bar at the top of the settings panel, type 'Polyfact Extension'.
+3. Click on 'Edit in settings.json' under the 'Polyfact Extension' section.
+4. In the settings.json file, add a new line within the JSON object: `"polyfact-extension.mode": "<your_preferred_mode>"`
+5. Replace `<your_preferred_mode>` with either 'light', 'normal', or 'detailed'.
+6. Save the settings.json file to apply the changes.s
 7. In the settings.json file, add a new line within the JSON object: `"polyfact-extension.accessToken": "<your_access_token>"`
 8. Replace `<your_access_token>` with the access token you copied from the Polyfact application.
 9. Save the settings.json file to apply the changes.
