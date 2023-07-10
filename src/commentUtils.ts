@@ -105,6 +105,7 @@ export async function commentFunctions(
 
       const config = vscode.workspace.getConfiguration("polyfact-extension");
       const accessToken = config.get("accessToken") as string;
+      const mode = config.get("mode") as string;
 
       const promises = functionsInCode.map(async (originalFunction, i) => {
         const request = new APIHandler();
@@ -113,7 +114,8 @@ export async function commentFunctions(
           const response = await request.comment(
             originalFunction,
             language,
-            accessToken
+            accessToken,
+            mode
           );
           const responseData = parseResponse(response);
           const codeWithBlockComment = insertComment(
@@ -128,9 +130,10 @@ export async function commentFunctions(
             increment: progressIncrement,
           });
         } catch (error: any) {
-          if (error.msg === "NOT_FUNCTION") {
+          console.log({ error });
+          if (error.message === "NOT_FUNCTION") {
             console.log("It's not a function : ", originalFunction);
-          } else if (error.msg === "INCOMPLETE_DATA") {
+          } else if (error.message === "INCOMPLETE_DATA") {
             vscode.window.showErrorMessage(
               "Failed to fetch comments for function: " + (i + 1)
             );

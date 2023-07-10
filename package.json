@@ -2,9 +2,10 @@
   "name": "polyfact-extension",
   "displayName": "Polyfact Extension",
   "description": "VS Code extension developed for efficient code comment management. It integrates with the Polyfact API and supports multiple programming languages.",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "Polyfactdocs",
   "license": "MIT",
+  "icon": "icons/icon.png",
   "engines": {
     "vscode": "^1.79.0"
   },
@@ -41,6 +42,16 @@
           "type": "string",
           "default": "",
           "description": "Access token for Polyfact Extension."
+        },
+        "polyfact-extension.mode": {
+          "type": "string",
+          "default": "normal",
+          "enum": [
+            "light",
+            "normal",
+            "detailed"
+          ],
+          "description": "Select the level of detail for the block comments that Polyfact extension should generate. 'Light' for minimal comments, 'Normal' for moderate detail, and 'Reinforced' for the most detailed comments."
         }
       }
     },

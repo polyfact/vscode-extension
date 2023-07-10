@@ -15,11 +15,12 @@ export class APIHandler {
   public async comment(
     code: string,
     language: string,
-    accessToken: string
+    accessToken: string,
+    mode: string
   ): Promise<any> {
     return axios.post(
       `${API_BASE_URL}${API_COMMENT_ENDPOINT}`,
-      { code, language },
+      { code, language, mode },
       {
         cancelToken: this.axiosSource.token,
         headers: {

@@ -1,7 +1,7 @@
 export function splitIntoCodeBlocks(code: string): string[] {
   const codeBlocks = code.split(/\n(?=\S)/g);
 
-  return codeBlocks.filter((block) => block.split("\n").length >= 5);
+  return codeBlocks.filter((block) => block.trim().split("\n").length >= 5);
 }
 
 export function addHeader(
