@@ -4,6 +4,10 @@ export function splitIntoCodeBlocks(code: string): string[] {
   return codeBlocks.filter((block) => block.trim().split("\n").length >= 5);
 }
 
+export function isError(obj: any): obj is Error {
+  return !!obj && obj.name && obj.message;
+}
+
 export function addHeader(
   code: string,
   symbols: { open: string; close: string }

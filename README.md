@@ -2,11 +2,11 @@
 
 ## Overview
 
-The Polyfact Extension is a Visual Studio Code extension designed to streamline code comment management. This powerful tool harnesses the capabilities of OpenAI's GPT-4 to intelligently manage and process your code comments. By integrating with the Polyfact API, it ensures broad programming language compatibility.
+The VSCode extension can help you add references to your code. Press CMD + SHIFT + D; the extension will create function references and insert them as comments in your code. The extension uses the Polyfact API to generate the references.
 
 ## Current Version
 
-As of the latest update, the project is at version 0.0.4.
+As of the latest update, the project is at version 0.1.2
 
 ## License
 
@@ -21,10 +21,6 @@ The Polyfact Extension is open-source software licensed under the terms of the M
 
 ## Configuration and Access Token Acquisition
 
-The Polyfact Extension requires an access token for integration with the Polyfact API. Here's how to acquire an access token and configure the `polyfact-extension.accessToken`:
-
-... (same steps as before)
-
 To set the detail level for the generated comments:
 
 1. Navigate to the Visual Studio Code settings (File > Preferences > Settings).
@@ -32,7 +28,16 @@ To set the detail level for the generated comments:
 3. Click on 'Edit in settings.json' under the 'Polyfact Extension' section.
 4. In the settings.json file, add a new line within the JSON object: `"polyfact-extension.mode": "<your_preferred_mode>"`
 5. Replace `<your_preferred_mode>` with either 'light', 'normal', or 'detailed'.
-6. Save the settings.json file to apply the changes.s
+6. Save the settings.json file to apply the changes.
+
+The Polyfact Extension requires an access token for integration with the Polyfact API. Here's how to acquire an access token and configure the `polyfact-extension.accessToken`:
+
+1. Visit [Polyfact's application](https://app.polyfact.com/) and click on 'Connect with Github'.
+2. Once you're authenticated with Github, you will be able to see your access token.
+3. Copy the provided access token.
+4. Now, navigate to the Visual Studio Code settings (File > Preferences > Settings).
+5. In the search bar at the top of the settings panel, type 'Polyfact Extension'.
+6. Click on 'Edit in settings.json' under the 'Polyfact Extension' section.
 7. In the settings.json file, add a new line within the JSON object: `"polyfact-extension.accessToken": "<your_access_token>"`
 8. Replace `<your_access_token>` with the access token you copied from the Polyfact application.
 9. Save the settings.json file to apply the changes.

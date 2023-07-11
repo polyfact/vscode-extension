@@ -2,7 +2,7 @@
   "name": "polyfact-extension",
   "displayName": "Polyfact Extension",
   "description": "VS Code extension developed for efficient code comment management. It integrates with the Polyfact API and supports multiple programming languages.",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "publisher": "Polyfactdocs",
   "license": "MIT",
   "icon": "icons/icon.png",

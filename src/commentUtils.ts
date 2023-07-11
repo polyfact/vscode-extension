@@ -1,6 +1,11 @@
 import * as vscode from "vscode";
 
 import { APIHandler } from "./api";
+import { isError } from "./helpers";
+
+const ERR_NOT_FUNCTION = "The provided data does not represent a function.";
+const ERR_INCOMPLETE_DATA =
+  "The provided data is incomplete. It must contain symbols and a comment.";
 
 type Data = {
   symbols?: { open: string; close: string };
@@ -9,7 +14,6 @@ type Data = {
   isFunction?: boolean;
 };
 
-// remove block comment
 export function removeBlockComment(code: string): string {
   const commentPatterns = [
     /\*[^]*?\*\//g, // For languages like JavaScript, Java, C, C++, C#, CSS, Swift, Rust, SQL, Kotlin, Scala, Groovy, PHP, Dart, Go
@@ -29,17 +33,15 @@ export function removeBlockComment(code: string): string {
   );
 }
 
-// insert comment
 export function insertComment(snippet: string, data: Data) {
   const { symbols, comment, isFunction } = data;
 
   if (!isFunction) {
-    throw new Error("NOT_FUNCTION");
+    throw new Error(ERR_NOT_FUNCTION);
   }
 
   if (!symbols || !comment) {
-    console.log({ symbols, comment, snippet, data });
-    throw new Error("INCOMPLETE_DATA");
+    throw new Error(ERR_INCOMPLETE_DATA);
   }
 
   const { open, close } = symbols;
@@ -68,23 +70,39 @@ export function extractBetweenBraces(text: string) {
   return text.slice(firstBrace, lastBrace + 1);
 }
 
-// parse response
-function parseResponse(response: any): any {
+export function parseResponse(response: any): any {
   return JSON.parse(extractBetweenBraces(response.data));
 }
 
-// update editor text
-async function updateEditorText(
+export function updateEditorText(
   editor: vscode.TextEditor,
   code: string
-): Promise<void> {
-  const fullRange = new vscode.Range(
-    editor.document.positionAt(0),
-    editor.document.positionAt(999999999999)
+): Thenable<boolean> {
+  const fullRange = editor.document.validateRange(
+    new vscode.Range(0, 0, Infinity, Infinity)
   );
-  await editor.edit((editBuilder) => {
+
+  return editor.edit((editBuilder) => {
     editBuilder.replace(fullRange, code);
   });
+}
+
+async function commentFunction(
+  originalFunction: string,
+  language: string,
+  accessToken: string,
+  mode: string
+): Promise<string> {
+  const request = new APIHandler();
+  const response = await request.comment(
+    originalFunction,
+    language,
+    accessToken,
+    mode
+  );
+  const responseData = parseResponse(response);
+
+  return insertComment(originalFunction, responseData);
 }
 
 export async function commentFunctions(
@@ -99,7 +117,7 @@ export async function commentFunctions(
       cancellable: true,
     },
     async (progress) => {
-      progress.report({ message: "Generating...", increment: 0 });
+      progress.report({ message: "Generating...", increment: 3 });
       const progressIncrement = 100 / functionsInCode.length;
       const language = editor.document.languageId;
 
@@ -108,19 +126,12 @@ export async function commentFunctions(
       const mode = config.get("mode") as string;
 
       const promises = functionsInCode.map(async (originalFunction, i) => {
-        const request = new APIHandler();
-
         try {
-          const response = await request.comment(
+          const codeWithBlockComment = await commentFunction(
             originalFunction,
             language,
             accessToken,
             mode
-          );
-          const responseData = parseResponse(response);
-          const codeWithBlockComment = insertComment(
-            originalFunction,
-            responseData
           );
 
           code = code.replace(originalFunction, codeWithBlockComment);
@@ -129,17 +140,19 @@ export async function commentFunctions(
             message: `Commenting function ${i + 1}`,
             increment: progressIncrement,
           });
-        } catch (error: any) {
-          console.log({ error });
-          if (error.message === "NOT_FUNCTION") {
-            console.log("It's not a function : ", originalFunction);
-          } else if (error.message === "INCOMPLETE_DATA") {
-            vscode.window.showErrorMessage(
-              "Failed to fetch comments for function: " + (i + 1)
-            );
+        } catch (error) {
+          if (isError(error)) {
+            if (error.message === ERR_NOT_FUNCTION) {
+              console.log("It's not a function : ", originalFunction);
+            } else if (error.message === ERR_INCOMPLETE_DATA) {
+              vscode.window.showErrorMessage(
+                "Failed to fetch comments for function: " + (i + 1)
+              );
+            }
+            console.error(error);
+          } else {
+            console.error("An unexpected error occurred: ", error);
           }
-          console.error(error);
-          request.cancelOperation(true);
         }
       });
 

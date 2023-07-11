@@ -1,9 +1,9 @@
 import * as assert from "assert";
 import * as sinon from "sinon";
 import axios from "axios";
-import { APIHandler } from "../../../src/api";
+import { APIHandler } from "../../api";
 
-import { API_BASE_URL, API_COMMENT_ENDPOINT } from "../../../src/config";
+import { API_BASE_URL, API_COMMENT_ENDPOINT } from "../../config";
 
 suite("APIHandler Test Suite", () => {
   let apiHandler: APIHandler;
@@ -36,7 +36,12 @@ suite("APIHandler Test Suite", () => {
     const language = "typescript";
     const accessToken = "test_token";
 
-    const result = await apiHandler.comment(code, language, accessToken);
+    const result = await apiHandler.comment(
+      code,
+      language,
+      accessToken,
+      "detailed"
+    );
 
     assert.ok(axiosStub.calledOnce);
     const args = axiosStub.getCall(0).args;

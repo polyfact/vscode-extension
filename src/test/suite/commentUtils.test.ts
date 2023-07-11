@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import * as commentUtils from "../../../src/commentUtils";
+import * as commentUtils from "../../commentUtils";
 
 suite("Comment Utils Test Suite", () => {
   test("removeBlockComment", () => {

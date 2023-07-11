@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { splitIntoCodeBlocks } from "../../../src/helpers";
+import { splitIntoCodeBlocks } from "../../helpers";
 
 suite("Helpers Test Suite", () => {
   test("splitIntoCodeBlocks", () => {
